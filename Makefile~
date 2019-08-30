@@ -1,0 +1,6 @@
+all:
+	rm retroSub || true
+bck_sub: all
+	gcc -o retroSub retroSubstituicao.c -Wall -O0 -D BACK_SUB
+fwd_sub: all
+	gcc -o retroSub retroSubstituicao.c -Wall -O0 -D FOWR_SUB
