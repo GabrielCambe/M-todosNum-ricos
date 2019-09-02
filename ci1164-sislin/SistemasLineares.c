@@ -9,6 +9,7 @@
 #define mymalloc(n,tipo) (tipo*)malloc(n*sizeof(tipo))
 #define testmalloc(v) if(v == NULL) abort()
 
+
 /*!
   \brief Essa função calcula a norma L2 do resíduo de um sistema linear 
 
@@ -19,8 +20,8 @@ real_t normaL2Residuo(SistLinear_t *SL, real_t *x)
 {
   unsigned int tam = SL->n;
   real_t *res = mymalloc(tam, real_t);
-  testmalloc(res);
-
+  testmalloc(res);  
+  
   //calcula resíduo
   for(int i = 0; i < tam; i++){
     res[i] = 0;
@@ -29,7 +30,13 @@ real_t normaL2Residuo(SistLinear_t *SL, real_t *x)
     }
   }
 
+#ifdef DEBUG_p
+  printf("\nResiduo:");
+  prnVetor(res, tam);
+#endif
+
   real_t norma = 0;
+  real_t diff = 0;
   //calcula norma do vetor ao residuo
   for(int i = 0; i < tam; i++){
     for(int j = 0; j < tam; j++){
@@ -44,6 +51,98 @@ real_t normaL2Residuo(SistLinear_t *SL, real_t *x)
   return norma;
 }
 
+void backwardSubstitution( SistLinear_t* SL, real_t* x ){
+  real_t* A = SL->A;
+  real_t* b = SL->b;
+  unsigned int n = SL->n;
+
+
+#ifdef DEBUG_p
+  printf("\nOperações BackwardSub:\n");
+#endif
+
+  int i,j;
+  i = n-1; j = n-1;
+  x[ i ] = b[ i ] / A[ index(i,j,n) ]; // termo isolado
+
+#ifdef DEBUG_p
+  printf( "x[%d] = b[%d] / A[%d];\n", i, j, index(i,j,n) );
+#endif
+
+  for ( i = n-2; i >= 0; i-- ){
+    x[ i ] = b[ i ];
+
+#ifdef DEBUG_p
+    printf( "x[%d] = b[%d];\n", i, i );
+#endif
+
+    for ( j = i+1; j <= n-1; ++j ){
+      x[ i ] -= A[ index(i, j, n) ] * x[ j ];
+
+#ifdef DEBUG_p
+      printf( "x[%d] -= A[%d] * x[%d];\n", i, index(i,j,n), j );
+#endif
+   
+    }
+    x[ i ] /= A[ index(i, i, n) ];
+
+#ifdef DEBUG_p
+    printf( "x[%d] /= A[%d];\n", i, index(i,i,n) );
+#endif
+  }
+
+#ifdef DEBUG_p
+  printf("\nx Calculado:\n");
+  for ( int i= 0; i < n; i++ )
+    printf( "%f\n", x[ i ]);
+#endif
+}
+
+void fowardSubstitution( SistLinear_t* SL, real_t* x ){
+  real_t* A = SL->A;
+  real_t* b = SL->b;
+  unsigned int n = SL->n;
+
+#ifdef DEBUG_p
+  printf("Operações FowardSub:\n");
+#endif
+
+  int i,j;
+  i = 0; j = 0;
+  x[ i ] = b[ i ] / A[ index(i,j,n) ]; // termo isolado
+
+#ifdef DEBUG_p
+  printf( "x[%d] = b[%d] / A[%d];\n", i, j, index(i,j,n) );
+#endif
+
+  for ( i = 1; i <= (n-1); i++ ){
+    x[ i ] = b[ i ];
+
+#ifdef DEBUG_p
+    printf( "x[%d] = b[%d];\n", i, i );
+#endif
+
+    for ( j = 0; j < i; ++j ){
+      x[ i ] -= A[ index(i, j, n) ] * x[ j ];
+
+#ifdef DEBUG_p 
+      printf( "x[%d] -= A[%d] * x[%d];\n", i, index(i,j,n), j );
+#endif
+
+    }
+    x[ i ] /= A[ index(i, i, n) ];
+
+#ifdef DEBUG_p
+    printf( "x[%d] /= A[%d];\n", i, index(i,i,n) );
+#endif
+  }
+
+#ifdef DEBUG_p
+  printf("\nx Calculado:\n");
+  for ( int i= 0; i < n; i++ )
+    printf( "%f\n", x[ i ]);
+#endif
+}
 
 /*!
   \brief Método da Eliminação de Gauss
@@ -56,30 +155,65 @@ real_t normaL2Residuo(SistLinear_t *SL, real_t *x)
 */
 int eliminacaoGauss (SistLinear_t *SL, real_t *x, int pivotamento)
 {
+#ifdef DEBUG_p
+  printf("\nOperações ELiminação de Gauss:\n");
+#endif
   unsigned int n = SL->n;
+
+  //Cria tabela de pivotamento
+  unsigned int* lut;
+  lut = mymalloc(n,unsigned int);
+  testmalloc(lut);
+  for(int k = 0; k < n; k++) lut[k] = k;
+  
+
+  //Copia SistLin para modificação:
+  SistLinear_t* SL_equiv = alocaSistLinear( n );
+  for(int i=0; i < n; ++i)
+    for(int j=0; j < n; ++j)
+      SL_equiv->A[index(lut[i],lut[j],n)] = SL->A[index(lut[i],lut[j],n)];
+  for(int i=0; i < n; ++i)
+    SL_equiv->b[lut[i]] = SL->b[lut[i]];
+
+  
   for(int k = 0; k < n-1; k++){ // k in [1..n-1]
+    //Faz o pivomento
     //ENCONTRE i >= k tal que aik != 0
-    //int i = 0;
-    //while(SL->A[index(i,k,n)] == 0 && i <= n)
-    //i++;
+        //int i = 0;
+        //while(SL->A[index(i,k,n)] == 0 && i <= n)
+        //i++;
+        //ABORTE se aii == 0, para todo i >= k
+    //TROQUE a linha k com a linha i    
+        //while(SL->A[index(i,k,n)] == 0 && i <= n)
+        //i++;
+        //if(i>n)
 
-    //ABORTE se aii == 0, para todo i >= k
-    
-    //TROQUE a linha k com a linha i
-    //while(SL->A[index(i,k,n)] == 0 && i <= n)
-    //i++;
-    //if(i>n)
-
+    //triangularização
     for(int i = k+1; i < n; i++){
-      //m = mik = aik/akk
-      //bi = bi - m*bk
+      real_t m = SL_equiv->A[index(lut[i],lut[k],n)]/SL_equiv->A[index(lut[k],lut[k],n)];
+      
+#ifdef DEBUG_p
+      printf("m = A_equiv[%d][%d]/A_equiv[%d][%d]\n", lut[i], lut[k], lut[k], lut[k]);
+#endif
+      // aik -= m * aik
+      SL_equiv->A[index(lut[i],lut[k],n)] = 0;
+#ifdef DEBUG_p
+      printf("A_equiv[%d][%d] = 0;\n", lut[i], lut[k]);
+#endif
       for(int j = k+1; j < n; j++){
-	//aij = aij - makj
+	SL_equiv->A[index(lut[i],lut[j],n)] -= m*SL_equiv->A[index(lut[k],lut[j],n)];
+#ifdef DEBUG_p
+	printf("A_equiv[%d][%d] -= m * A_equiv[%d][%d]\n", lut[i], lut[j], lut[k], lut[j]);
+#endif
       }
+      SL_equiv->b[lut[i]] -= m*SL_equiv->b[lut[k]];
+#ifdef DEBUG_p
+      printf("b_equiv[%d] -= m * b_equiv[%d]\n", lut[i], lut[k]);
+#endif
     }       
   }
 
-  /*
+  /*// ELIMINACAO GAUSS
     for(int k = 1; k < n-1; k++){
      int w = abs(akk);
      for(int j = k; j < n; j++){
@@ -98,7 +232,18 @@ int eliminacaoGauss (SistLinear_t *SL, real_t *x, int pivotamento)
      }
     }
 */
-  
+
+#ifdef DEBUG_p
+  printf("Sistema Triangular Equivalente:\n");
+  prnSistLinear(SL_equiv);
+#endif
+
+  //RESOLUÇÃO DO SISTEMA TRIANGULAR
+  backwardSubstitution(SL_equiv, x);
+
+  free(lut);
+  liberaSistLinear(SL_equiv);
+  return 0;
 }
 
 /*!
@@ -111,11 +256,12 @@ int eliminacaoGauss (SistLinear_t *SL, real_t *x, int pivotamento)
   \return código de erro. Um nr positivo indica sucesso e o nr
           de iterações realizadas. Um nr. negativo indica um erro.
 */
-int gaussJacobi (SistLinear_t *SL, real_t *x, real_t erro)
+
+/*int gaussJacobi (SistLinear_t *SL, real_t *x, real_t erro)
 {
   
 
-}
+}*/
 
 /*!
   \brief Método de Gauss-Seidel
@@ -127,13 +273,15 @@ int gaussJacobi (SistLinear_t *SL, real_t *x, real_t erro)
   \return código de erro. Um nr positivo indica sucesso e o nr
           de iterações realizadas. Um nr. negativo indica um erro.
   */
-int gaussSeidel (SistLinear_t *SL, real_t *x, real_t erro)
+
+/*int gaussSeidel (SistLinear_t *SL, real_t *x, real_t erro)
 {
   while(){
   }
   printf("Não houve convergência!");
 
 }
+*/
 
 
 // Alocaçao de memória
@@ -184,7 +332,7 @@ void inicializaSistLinear (SistLinear_t *SL, tipoSistLinear_t tipo, real_t coef_
   if (tipo == hilbert) {
     for (unsigned int i=0; i<tam; ++i) {
       for (unsigned int j=0; j<tam; ++j)  {
-	      SL->A[i*tam+j] = 1.0 / (real_t)(i+j+1);
+	      SL->A[index(i,j,tam)] = 1.0 / (real_t)(i+j+1);
       }
     }
   }
@@ -192,7 +340,7 @@ void inicializaSistLinear (SistLinear_t *SL, tipoSistLinear_t tipo, real_t coef_
     // inicializa a matriz A
     for (unsigned int i=0; i<tam; ++i) {
       for (unsigned int j=0; j<tam; ++j)  {
-	      SL->A[i*tam+j] = (real_t)rand() * invRandMax;
+	      SL->A[index(i,j,tam)] = (real_t)rand() * invRandMax;
       }
     }
     if (tipo == eqNula) {
@@ -226,7 +374,7 @@ void inicializaSistLinear (SistLinear_t *SL, tipoSistLinear_t tipo, real_t coef_
     else if (tipo == diagDominante) {
       // aumenta o expoente dos termos da diagonal principal
       for (unsigned int i=0; i<tam; ++i) {
-        SL->A[i*tam+i] *= (real_t)tam;
+        SL->A[index(i,i,tam)] *= (real_t)tam;
       }
     }
 
@@ -247,7 +395,7 @@ SistLinear_t *lerSistLinear ()
   
   for(int i=0; i < n; ++i)
     for(int j=0; j < n; ++j)
-      scanf ("%lg", &SL->A[i*n+j]);
+      scanf ("%lg", &SL->A[index(i,j,n)]);
 
   for(int i=0; i < n; ++i)
     scanf ("%lg", &SL->b[i]);
