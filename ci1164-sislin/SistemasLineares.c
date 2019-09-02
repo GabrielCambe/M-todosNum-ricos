@@ -156,6 +156,7 @@ void fowardSubstitution( SistLinear_t* SL, real_t* x ){
 int eliminacaoGauss (SistLinear_t *SL, real_t *x, int pivotamento)
 {
 #ifdef DEBUG_p
+  double tempo_exec = timestamp();
   printf("\nOperações ELiminação de Gauss:\n");
 #endif
   unsigned int n = SL->n;
@@ -241,6 +242,11 @@ int eliminacaoGauss (SistLinear_t *SL, real_t *x, int pivotamento)
   //RESOLUÇÃO DO SISTEMA TRIANGULAR
   backwardSubstitution(SL_equiv, x);
 
+#ifdef DEBUG_p
+  tempo_exec -= timestamp();
+  printf("%Tempo de Execucao de eliminacaoGauss + backSubstitution: 10.10lf seg.\n", -(tempo_exec)*1000);
+#endif
+  
   free(lut);
   liberaSistLinear(SL_equiv);
   return 0;
@@ -257,11 +263,37 @@ int eliminacaoGauss (SistLinear_t *SL, real_t *x, int pivotamento)
           de iterações realizadas. Um nr. negativo indica um erro.
 */
 
-/*int gaussJacobi (SistLinear_t *SL, real_t *x, real_t erro)
+int gaussJacobi (SistLinear_t *SL, real_t *x, real_t erro)
 {
-  
+#ifdef DEBUG_p
+  double tempo_exec = timestamp();
+  printf("\nOperações Gauss-Jacobi:\n");
+#endif
 
-}*/
+  unsigned int n = SL->n;
+  
+  for(int k = 0; k < MAXIT; ++k){
+    for(int i = 0; i < n; ++i){
+      x/*next*/[i] = SL->b[i];
+      for(int j = 0; j < n; ++j){
+	if(i != j){
+	  x[i]/*next*/ -= SL->A[index(i,j,n)] * x[j]/*prev*/;
+	}
+      }
+      x/*next*/[i] /= SL->A[index(i,i,n)];
+    }
+    if()// checar tolerancia
+  }
+
+  //checar maximo de iterações
+
+#ifdef DEBUG_p
+  tempo_exec -= timestamp();
+  printf("%Tempo de Execucao de gaussJacobi: 10.10lf seg.\n", -(tempo_exec)*1000);
+#endif
+  
+  return 0;
+}
 
 /*!
   \brief Método de Gauss-Seidel
@@ -276,10 +308,21 @@ int eliminacaoGauss (SistLinear_t *SL, real_t *x, int pivotamento)
 
 /*int gaussSeidel (SistLinear_t *SL, real_t *x, real_t erro)
 {
+#ifdef DEBUG_p
+  double tempo_exec = timestamp();
+  printf("\nOperações Gauss-Seidel:\n");
+#endif
+
   while(){
   }
   printf("Não houve convergência!");
 
+#ifdef DEBUG_p
+  tempo_exec -= timestamp();
+  printf("%Tempo de Execucao de eliminacaoGauss + backSubstitution: 10.10lf seg.\n", -(tempo_exec)*1000);
+#endif
+
+return 0;
 }
 */
 
