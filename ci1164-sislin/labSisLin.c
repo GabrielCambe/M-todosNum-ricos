@@ -7,7 +7,7 @@
 #define index(i,j,n) (i*n)+j
 #define mymalloc(n,tipo) (tipo*)malloc(n*sizeof(tipo))
 #define testmalloc(v) if(v == NULL) abort()
-#define SIST_tam 10
+#define SIST_tam 100
 
 int main ()
 {
