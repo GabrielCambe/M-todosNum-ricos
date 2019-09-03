@@ -11,8 +11,7 @@
 
 %.o: %.c %.h utils.h
 	$(CC) -c $(CFLAGS) $<
-
-$(PROG):  $(OBJS)
+  $(PROG):  $(OBJS)
 	$(CC) -o $@ $^ $(LFLAGS)
 
 clean:

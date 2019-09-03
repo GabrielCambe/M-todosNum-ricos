@@ -244,7 +244,7 @@ int eliminacaoGauss (SistLinear_t *SL, real_t *x, int pivotamento)
 
 #ifdef DEBUG_p
   tempo_exec -= timestamp();
-  printf("%Tempo de Execucao de eliminacaoGauss + backSubstitution: 10.10lf seg.\n", -(tempo_exec)*1000);
+  printf("Tempo de Execucao de eliminacaoGauss + backSubstitution: %10.10lf seg.\n", -(tempo_exec)/1000);
 #endif
   
   free(lut);
@@ -263,36 +263,82 @@ int eliminacaoGauss (SistLinear_t *SL, real_t *x, int pivotamento)
           de iterações realizadas. Um nr. negativo indica um erro.
 */
 
-int gaussJacobi (SistLinear_t *SL, real_t *x, real_t erro)
-{
+int gaussJacobi (SistLinear_t *SL, real_t *x, real_t erro){
 #ifdef DEBUG_p
   double tempo_exec = timestamp();
   printf("\nOperações Gauss-Jacobi:\n");
 #endif
 
   unsigned int n = SL->n;
-  
-  for(int k = 0; k < MAXIT; ++k){
-    for(int i = 0; i < n; ++i){
-      x/*next*/[i] = SL->b[i];
-      for(int j = 0; j < n; ++j){
-	if(i != j){
-	  x[i]/*next*/ -= SL->A[index(i,j,n)] * x[j]/*prev*/;
-	}
-      }
-      x/*next*/[i] /= SL->A[index(i,i,n)];
-    }
-    if()// checar tolerancia
-  }
+  real_t diff, max_diff;
+  real_t *x_next = mymalloc(n,real_t);
+  testmalloc(x_next);
 
-  //checar maximo de iterações
+  for(int k = 0; k <= MAXIT; ++k){
 
 #ifdef DEBUG_p
-  tempo_exec -= timestamp();
-  printf("%Tempo de Execucao de gaussJacobi: 10.10lf seg.\n", -(tempo_exec)*1000);
+    printf("Iteração %d:\n\n", k);
 #endif
+
+    for(int i = 0; i < n; ++i){
+      x_next[i] = SL->b[i];
+
+#ifdef DEBUG_p
+      printf("x_next[%d] = b[%d];\n", i, i);
+#endif
+
+      for(int j = 0; j < n; ++j){
+	      if(j != i){
+	        x_next[i] -= SL->A[index(i,j,n)] * x[j];
+
+#ifdef DEBUG_p
+          printf("x_next[%d] -= A[%d] * x[%d];\n", i, index(i,j,n), j);
+#endif
+
+	      }
+      }
+      x_next[i] /= SL->A[index(i,i,n)];
+
+#ifdef DEBUG_p
+      printf("x_next[%d] /= A[%d];\n", i, index(i,i,n));
+#endif
+
+    }
+    
+    // checar tolerancia 
+    max_diff = 0;
+    for(int t = 0; t < n; ++t){
+      diff = abs(x_next[t] - x[t]); 
+      if( diff > max_diff )
+        max_diff = diff;
+    }
+    if( max_diff < erro ){      
+      break;
+    }
+
+    //checar maximo de iterações
+    if( k == MAXIT ){
+      printf("Não houve convergência!\n");
+      free(x_next);
+      return 0;
+    }
+
+    for(int t = 0; t < n; ++t){
+      x[t] = x_next[t]; 
+    }
+  }
   
-  return 0;
+  for(int t = 0; t < n; ++t){
+    x[t] = x_next[t]; 
+  }
+
+#ifdef DEBUG_p
+      tempo_exec -= timestamp();
+      printf("Tempo de Execucao de gaussJacobi: %10.10lf seg.\n", -(tempo_exec)/1000);
+#endif
+
+  free(x_next);
+  return 1;
 }
 
 /*!
@@ -319,7 +365,7 @@ int gaussJacobi (SistLinear_t *SL, real_t *x, real_t erro)
 
 #ifdef DEBUG_p
   tempo_exec -= timestamp();
-  printf("%Tempo de Execucao de eliminacaoGauss + backSubstitution: 10.10lf seg.\n", -(tempo_exec)*1000);
+  printf("%Tempo de Execucao de eliminacaoGauss + backSubstitution: 10.10lf seg.\n", -(tempo_exec)/1000);
 #endif
 
 return 0;
