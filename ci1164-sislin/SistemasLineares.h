@@ -2,7 +2,7 @@
 #define __SISLINEAR_H__
 
 // Parâmetros para teste de convergência
-#define MAXIT 1000000
+#define MAXIT 1000
 #define EPS 1.0e-4
 
 #define COEF_MAX 32.0

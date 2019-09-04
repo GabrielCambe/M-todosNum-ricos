@@ -9,6 +9,24 @@
 #define mymalloc(n,tipo) (tipo*)malloc(n*sizeof(tipo))
 #define testmalloc(v) if(v == NULL) abort()
 
+real_t kahanSum( real_t *input, unsigned int tam ){
+  real_t sum = 0.0;                    // Prepare the accumulator.
+  real_t c = 0.0;                     // A running compensation for lost low-order bits.
+  
+  for (int i = 0; i < tam; i++){     // The array input has elements indexed input[1] to input[input.length].
+    // adicionei essas definições, eram definidas dentro do for anteriormente.
+    real_t y = 0.0;
+    real_t t = 0.0;
+    //-------------------
+    y = input[i] - c;         // c is zero the first time around.
+    t = sum + y;              // Alas, sum is big, y small, so low-order digits of y are lost.
+    c = (t - sum) - y;            // (t - sum) cancels the high-order part of y; subtracting y recovers negative (low part of y)
+    sum = t;                      // Algebraically, c should always be zero. Beware overly-aggressive optimizing compilers!
+    // Next time around, the lost low part will be added to y in a fresh attempt.
+  }
+  return sum;
+}
+
 
 /*!
   \brief Essa função calcula a norma L2 do resíduo de um sistema linear 
@@ -40,7 +58,7 @@ real_t normaL2Residuo(SistLinear_t *SL, real_t *x)
   //calcula norma do vetor ao residuo
   for(int i = 0; i < tam; i++){
     for(int j = 0; j < tam; j++){
-      diff = abs(res[i] - SL->b[i]);
+      diff = fabs(res[i] - SL->b[i]);
       norma += diff * diff;
     }
   }
@@ -155,8 +173,8 @@ void fowardSubstitution( SistLinear_t* SL, real_t* x ){
 */
 int eliminacaoGauss (SistLinear_t *SL, real_t *x, int pivotamento)
 {
-#ifdef DEBUG_p
   double tempo_exec = timestamp();
+#ifdef DEBUG_p
   printf("\nOperações ELiminação de Gauss:\n");
 #endif
   unsigned int n = SL->n;
@@ -216,10 +234,10 @@ int eliminacaoGauss (SistLinear_t *SL, real_t *x, int pivotamento)
 
   /*// ELIMINACAO GAUSS
     for(int k = 1; k < n-1; k++){
-     int w = abs(akk);
+     int w = fabs(akk);
      for(int j = k; j < n; j++){
-      if(abs(ajk) > w){
-       w = abs(ajk);
+      if(fabs(ajk) > w){
+       w = fabs(ajk);
        r = j;
       }
       //Trocar linhas k e r
@@ -242,10 +260,8 @@ int eliminacaoGauss (SistLinear_t *SL, real_t *x, int pivotamento)
   //RESOLUÇÃO DO SISTEMA TRIANGULAR
   backwardSubstitution(SL_equiv, x);
 
-#ifdef DEBUG_p
   tempo_exec -= timestamp();
   printf("Tempo de Execucao de eliminacaoGauss + backSubstitution: %10.10lf seg.\n", -(tempo_exec)/1000);
-#endif
   
   free(lut);
   liberaSistLinear(SL_equiv);
@@ -264,8 +280,8 @@ int eliminacaoGauss (SistLinear_t *SL, real_t *x, int pivotamento)
 */
 
 int gaussJacobi (SistLinear_t *SL, real_t *x, real_t erro){
-#ifdef DEBUG_p
   double tempo_exec = timestamp();
+#ifdef DEBUG_p
   printf("\nOperações Gauss-Jacobi:\n");
 #endif
 
@@ -276,46 +292,6 @@ int gaussJacobi (SistLinear_t *SL, real_t *x, real_t erro){
 
   for(int k = 0; k <= MAXIT; ++k){
 
-#ifdef DEBUG_p
-    printf("Iteração %d:\n\n", k);
-#endif
-
-    for(int i = 0; i < n; ++i){
-      x_next[i] = SL->b[i];
-
-#ifdef DEBUG_p
-      printf("x_next[%d] = b[%d];\n", i, i);
-#endif
-
-      for(int j = 0; j < n; ++j){
-	      if(j != i){
-	        x_next[i] -= SL->A[index(i,j,n)] * x[j];
-
-#ifdef DEBUG_p
-          printf("x_next[%d] -= A[%d] * x[%d];\n", i, index(i,j,n), j);
-#endif
-
-	      }
-      }
-      x_next[i] /= SL->A[index(i,i,n)];
-
-#ifdef DEBUG_p
-      printf("x_next[%d] /= A[%d];\n", i, index(i,i,n));
-#endif
-
-    }
-    
-    // checar tolerancia 
-    max_diff = 0;
-    for(int t = 0; t < n; ++t){
-      diff = abs(x_next[t] - x[t]); 
-      if( diff > max_diff )
-        max_diff = diff;
-    }
-    if( max_diff < erro ){      
-      break;
-    }
-
     //checar maximo de iterações
     if( k == MAXIT ){
       printf("Não houve convergência!\n");
@@ -323,19 +299,57 @@ int gaussJacobi (SistLinear_t *SL, real_t *x, real_t erro){
       return 0;
     }
 
-    for(int t = 0; t < n; ++t){
+#ifdef DEBUG_p
+    printf("Iteração %d:\n\n", k);
+#endif
+
+    for(int i = 0; i < n; i++){
+      x_next[i] = SL->b[i];
+
+#ifdef DEBUG_p
+      printf("x_next[%d] = b[%d];\n", i, i);
+#endif
+
+      for(int j = 0; j < n; j++){
+	      if(j != i){
+	        x_next[i] -= (SL->A[index(i,j,n)]) * x[j];
+
+#ifdef DEBUG_p
+          printf("x_next[%d] -= A[%d] * x[%d];\n", i, index(i,j,n), j);
+#endif
+
+	      }
+      }
+      if( SL->A[index(i,i,n)] )
+        x_next[i] /= SL->A[index(i,i,n)];
+
+#ifdef DEBUG_p
+      printf("x_next[%d] /= A[%d];\n", i, index(i,i,n));
+#endif
+    }
+    
+    // checar tolerancia 
+    max_diff = 0;
+    for(int t = 0; t < n; t++){
+      diff = fabs(x_next[t] - x[t]); 
+      if( diff > max_diff )
+        max_diff = diff;
+    }
+    if( max_diff < erro ){      
+      break;
+    }
+
+    for(int t = 0; t < n; t++){
       x[t] = x_next[t]; 
     }
   }
   
-  for(int t = 0; t < n; ++t){
+  for(int t = 0; t < n; t++){
     x[t] = x_next[t]; 
   }
 
-#ifdef DEBUG_p
-      tempo_exec -= timestamp();
-      printf("Tempo de Execucao de gaussJacobi: %10.10lf seg.\n", -(tempo_exec)/1000);
-#endif
+  tempo_exec -= timestamp();
+  printf("Tempo de Execucao de gaussJacobi: %10.10lf seg.\n", -(tempo_exec)/1000);
 
   free(x_next);
   return 1;
@@ -352,25 +366,109 @@ int gaussJacobi (SistLinear_t *SL, real_t *x, real_t erro){
           de iterações realizadas. Um nr. negativo indica um erro.
   */
 
-/*int gaussSeidel (SistLinear_t *SL, real_t *x, real_t erro)
-{
-#ifdef DEBUG_p
+int gaussSeidel (SistLinear_t *SL, real_t *x, real_t erro){
   double tempo_exec = timestamp();
+#ifdef DEBUG_p
   printf("\nOperações Gauss-Seidel:\n");
 #endif
 
-  while(){
-  }
-  printf("Não houve convergência!");
+  unsigned int n = SL->n;
+  real_t diff, max_diff;
+  real_t *x_next = mymalloc(n,real_t);
+  testmalloc(x_next);
+
+  for(int k = 0; k <= MAXIT; ++k){
+
+    //checar maximo de iterações
+    if( k == MAXIT ){
+      printf("Não houve convergência!\n");
+      free(x_next);
+      return 0;
+    }
 
 #ifdef DEBUG_p
-  tempo_exec -= timestamp();
-  printf("%Tempo de Execucao de eliminacaoGauss + backSubstitution: 10.10lf seg.\n", -(tempo_exec)/1000);
+    printf("Iteração %d:\n\n", k);
 #endif
 
-return 0;
+    //--------------------- SK
+    real_t sum, c, y, t;
+    //--------------------- SK
+
+    for(int i = 0; i < n; ++i){
+      x_next[i] = SL->b[i];
+
+#ifdef DEBUG_p
+      printf("x_next[%d] = b[%d];\n", i, i);
+#endif
+      //-------------------- SK
+      sum = 0.0;
+      c = 0.0;
+      //-------------------- SK
+
+      for(int j = 0; j < n; ++j){
+        //------------------ SK
+        y = 0.0;
+        t = 0.0;
+        //------------------- SK
+
+        if( j != i ){
+          if(j < i){
+            y = (-(SL->A[index(i,j,n)] * x_next[j]) - c);
+	          t = (x_next[i] + y);
+            c = (t - x_next[i]) - y;
+            x_next[i] = t;
+
+#ifdef DEBUG_p
+            printf("x_next[%d] -= A[%d] * x_next[%d];\n", i, index(i,j,n), j);
+#endif
+	        }else{
+            y = (-(SL->A[index(i,j,n)] * x[j]) - c);
+	          t = (x_next[i] + y);
+            c = (t - x_next[i]) - y;
+            x_next[i] = t;
+
+#ifdef DEBUG_p
+            printf("x_next[%d] -= A[%d] * x[%d];\n", i, index(i,j,n), j);
+#endif
+          }
+        }
+      }
+      if(SL->A[index(i,i,n)])
+        x_next[i] /= SL->A[index(i,i,n)];
+
+#ifdef DEBUG_p
+      printf("x_next[%d] /= A[%d];\n", i, index(i,i,n));
+#endif
+
+    }
+    
+    // checar tolerancia 
+    max_diff = 0;
+    for(int t = 0; t < n; t++){
+      diff = fabs( (x_next[t] - x[t]) ); 
+      if( diff > max_diff ){
+        max_diff = diff;
+      }
+    }
+    if( max_diff < erro ){
+      for(int t = 0; t < n; ++t){
+        x[t] = x_next[t]; 
+      }     
+      break;
+    }  
+
+    for(int t = 0; t < n; ++t){
+      x[t] = x_next[t]; 
+    }
+  }
+
+  tempo_exec -= timestamp();
+  printf("Tempo de Execucao de gaussSiedel: %10.10lf seg.\n", -(tempo_exec)/1000);
+
+  free(x_next);
+  return 1;
 }
-*/
+
 
 
 // Alocaçao de memória
