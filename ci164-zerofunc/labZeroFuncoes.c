@@ -63,6 +63,15 @@ double func_4 (double x) { // x^4 +15x^3 - 24x - 5 = 0
   return (pow(x, 4)+(15*pow(x, 3)-(24*x)-5));
 }
 
+double dfunc_4 (double x) { // 4x^3 +3*15x^2 - 24*1 = 0
+  // raizes = x≈-14.893, x≈-1.1986, x≈-0.21441, x≈1.3063  
+  return (4*pow(x, 3)+45*pow(x, 2)-24);
+}
+
+double func_5 (double x) {
+  return (pow((x-128), 2)/pow(128, 2));
+}
+
 /***************************/
 
 int main ()
@@ -89,8 +98,11 @@ int main ()
   printf("#=============================================================================\n");
 
   int maxit = MAXIT;
-  bisseccao(func_4, -20, -10, EPS, &maxit, &raiz);
-
+  bisseccao(func_4, 0, 10, EPS, &maxit, &raiz);
+  //bisseccao(func_, -20, -10, EPS, &maxit, &raiz);
+  secante(func_4, 0, 10, EPS, &maxit, &raiz);
+  newton(func_4, dfunc_4, 10, EPS, &maxit, &raiz);
+  
   // Imprimir média real e calculada em vetor de valores reais
   printf("# ==============================================================================\n");
   printf("# Média       , calculada    , real         , diff         , tempo(ms)\n");
