@@ -4,18 +4,16 @@
 #include "utils.h"
 #include "ZeroFuncao.h"
 
-//#ifndef __DEBUG__
-//#define __DEBUG__
-//#endif
-
 // ESTIMA INTERVALO
 // int estimaInterv( double *a, double *b , double h){ 
 
 int bisseccao (double (*f)(const double x), double a, double b,
                double eps, int *it, double *raiz)
 {
-  double erro, fa, fr, fb, raiz_ant;
-
+  //double erro, fa, fr, fb, raiz_ant;
+  int k = 1;
+  int m;
+  
 #ifdef __DEBUG__
   fprintf(stderr, "\n\n****** Iterações Bissecção *******\n");
   fprintf(stderr, "=================================================================================================\n");
@@ -26,25 +24,24 @@ int bisseccao (double (*f)(const double x), double a, double b,
    /* ENTRADA: Função f, extremos do intervalo a, b, tolerância TOL, número máximo de iterações NMAX
 CONDIÇÕES: a < b, ou f(a) < 0 e f(b) > 0 ou f(a) > 0 e f(b) < 0
 SAÍDA: valor que difere de uma raiz de f(x)=0 por menos do que TOL */
-  
-  int k = 1;
-  int m;
+
   while ( k <= (*it) ){ // limita o número de iterações para prevenir um loop infinito
     (*raiz) = (a + b)/2; // novo ponto médio
+    
+#ifdef __DEBUG__
+  fprintf(stderr, "%4d %12.8g %12.8g %12.8g ", k, a, b, *raiz);
+  fprintf(stderr, "%12.4e %12.4e %12.4e %12.4e\n", f(*raiz), fabs(a-b), f(a), f(b));
+#endif
+        
     if ( (f((*raiz)) == 0) || (b-a)/2 < eps )
       return 0; // solução encontrada
     k += 1; // incrementa o contador de iterações
     if ( (f((*raiz)) < 0 && f(a) < 0) || (f((*raiz)) >= 0 && f(a) >= 0) ) // )) então a ← c senão b ← c # novo intervalo
       a = (*raiz);
     else
-      b = (*raiz);
-
-#ifdef __DEBUG__
-  fprintf(stderr, "%4d %12.8g %12.8g %12.8g ", k, a, b, *raiz);
-  fprintf(stderr, "%12.4e %12.4e %12.4e %12.4e\n", fr, fabs(a-b), fa, fb);
-#endif 
-    
+      b = (*raiz);    
   }
+  
   fprintf( stderr, "O algoritmo falhou! Núm. máximo de iterações excedido!"); 
   return -1; //solucao não encontrada
   
@@ -93,9 +90,8 @@ int newton (double (*f)(const double x), double (*df)(const double x), double x0
  *
  */
 
- float secantes(float (*func)(float), float x0, float x1, float tolerancia) {
-   
-}
+//float secantes(float (*func)(float), float x0, float x1, float tolerancia) { 
+//}
  
 int secante (double (*f)(const double x), double x0, double x1, 
              double eps, int *it, double *raiz)
@@ -123,17 +119,16 @@ int secante (double (*f)(const double x), double x0, double x1,
       *raiz = x2;
       return 0; //solução encontrada
     }
+
+#ifdef __DEBUG__
+    fprintf(stderr, "%4d %12.8g %12.8g %12.8g ", k, x0, x1, *raiz);
+    fprintf(stderr, "%12.4e %12.4e %12.4e %12.4e\n", f(*raiz), fabs(*raiz-x0), fx0, fx1);
+#endif    
     
     x0=x1;
     fx0=fx1;
 
     x1=x2;
-
-#ifdef __DEBUG__
-    fprintf(stderr, "%4d %12.8g %12.8g %12.8g ", k, x0, x1, *raiz);
-    fprintf(stderr, "%12.4e %12.4e %12.4e %12.4e\n", f(*raiz), fabs(*raiz-x0), fx0, fx1);
-#endif
-    
   }  
     
   //nrerror("Número máximo de iterações excedido!");
@@ -146,7 +141,7 @@ int secante (double (*f)(const double x), double x0, double x1,
  */
 int calcPolinomioEDerivada(Polinomio pol, double x, double *px, double *dpx )
 {
-
+  b = pol.p[pol.grau];
   return 0;
 }
 

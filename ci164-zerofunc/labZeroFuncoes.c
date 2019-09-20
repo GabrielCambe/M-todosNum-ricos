@@ -113,7 +113,8 @@ int main ()
   media_real = 1.0;
   double *vector = (double *) malloc( sizeof(double) * vec_size);
 
-  for (i=1, x=1.0/(vec_size-2); i<vec_size; ++i) {
+  vector[0] = vec_size-1;
+  for (i=1, x=1.0/(vec_size-1); i<vec_size; ++i) {
     vector[i] = x;
   }
   tempo = timestamp();
