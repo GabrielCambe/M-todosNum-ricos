@@ -1,0 +1,22 @@
+#!/usr/bin/gnuplot -c
+set grid
+set style data point
+set style function line
+set style line 1 lc 3 pt 7 ps 0.3
+set boxwidth 1
+set xtics
+set xrange ["0":]
+set xlabel  "N (Mbytes)"
+set ylabel  "<metrica 1>"
+set title   "<campo[<metrica]>"
+set terminal qt 0 title "<campo[<metrica]>"
+plot 'plot_exemplo-01.dat' title "<marker 1>" with linespoints, \
+     'plot_exemplo-02.dat' title "<marker 2>" with linespoints
+
+set ylabel  "<metrica 2>"
+set title   "<campo[<metrica]>"
+set terminal qt 1 title "<campo[<metrica]>"
+plot 'plot_exemplo-03.dat' title "<marker 3>" with linespoints, \
+     'plot_exemplo-04.dat' title "<marker 4>" with linespoints
+
+pause mouse

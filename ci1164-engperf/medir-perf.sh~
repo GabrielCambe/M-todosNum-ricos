@@ -1,0 +1,11 @@
+#!/bin/bash
+
+echo "performance" > /sys/devices/system/cpu/cpufreq/policy3/scaling_governor
+
+for i in 32 50 64 100 128 200 256 300 400 512 1000 1024 2000 2048 3000 4000 4096 5000 10000; do
+    for g in L3 L2CACHE FLOPS_DP FLOPS_AVX ; do
+	echo likwid-perfctr -C 3 -g $g -m ./matmult -n $i
+    done
+done 
+
+echo "powersave" > /sys/devices/system/cpu/cpufreq/policy3/scaling_governor
