@@ -141,7 +141,20 @@ int secante (double (*f)(const double x), double x0, double x1,
  */
 int calcPolinomioEDerivada(Polinomio pol, double x, double *px, double *dpx )
 {
+  double b, c;
+  
   b = pol.p[pol.grau];
+  c = 0;
+  for( int i = 1; i < pol.grau; i++ ){
+    b = ( b * x ) + pol.p[ pol.grau - i ];
+    c = x * ( b + c );
+  }
+  b = ( b * x ) + pol.p[0];
+  c = b + c;
+
+  *px = b;
+  *dpx = c;
+
   return 0;
 }
 

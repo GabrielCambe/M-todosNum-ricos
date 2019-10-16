@@ -1,5 +1,5 @@
     CC     = gcc -std=c11
-    CFLAGS = -D__DEBUG__
+    CFLAGS = -D__DEBUG__ -O0
     LFLAGS = -lm
 
       PROG = labZeroFuncoes

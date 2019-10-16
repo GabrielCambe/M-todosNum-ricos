@@ -123,12 +123,12 @@ int main ()
   printf("# Média       , calculada    , real         , diff         , tempo(ms)\n");
   printf("# ==============================================================================\n");
   double x, media_vec, media_real;
-  unsigned long vec_size = 1000000000;
+  unsigned long vec_size = 10000000;
 
   media_real = 1.0;
   double *vector = (double *) malloc( sizeof(double) * vec_size);
 
-  vector[0] = vec_size-1;
+  vector[0] = vec_size-1.0;
   for (i=1, x=1.0/(vec_size-1); i<vec_size; ++i) {
     vector[i] = x;
   }
