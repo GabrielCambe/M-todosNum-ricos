@@ -1,0 +1,10 @@
+#!/bin/bash
+
+#./medir-perf.sh | while read line || [[ -n $line ]]; do
+#    #echo $line |  awk -F'[:,;]' '{for (i =1; i<=NF ; i++) {print $i}}'
+#    echo $line |  awk -F'[:,;]' '{ if({for (i=1; i<=NF; i++) {if $i~/Group 1 Metric/}}'
+#done
+
+./medir-perf.sh | while read line || [[ -n $line ]]; do
+    echo $line |  awk -F'[:,;]' '{{for (i=1; i<=NF; i++) {if ($i~/Table/) table +=   }}'
+done
