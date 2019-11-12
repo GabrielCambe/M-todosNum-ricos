@@ -1,0 +1,17 @@
+#!/usr/bin/gnuplot -c
+set grid
+set style data point
+set style function line
+set style line 1 lc 3 pt 7 ps 0.3
+set boxwidth 1
+set xtics
+set xrange ["0":]
+set xlabel  "N^2 * 8bytes"
+set ylabel  "L2 miss ratio"
+set title   "Miss ratio para a Cache L2"
+#set terminal qt 0 title "<campo[<metrica]>"
+plot 'L2CACHEmultMatPtrVet.dat' title "multMatPtrVet" with linespoints, \
+     'L2CACHEmultMatRowVet.dat' title "multMatRowVet" with linespoints, \
+	'L2CACHEmultMatColVet.dat' title "multMatColVet" with linespoints
+
+pause -1

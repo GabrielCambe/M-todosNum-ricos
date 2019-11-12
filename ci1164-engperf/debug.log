@@ -3,85 +3,76 @@ CPU name:	Intel(R) Core(TM) i5-7500 CPU @ 3.40GHz
 CPU type:	Intel Coffeelake processor
 CPU clock:	3.41 GHz
 --------------------------------------------------------------------------------
-tempo multMatPtrVet, n = 100: 0.211353ms
-tempo multMatRowVet, n = 100: 0.199979ms
-tempo multMatColVet, n = 100: 0.199820ms
+tempo multMatPtrVet, n = 128: 0.210376ms
+tempo multMatRowVet, n = 128: 0.202079ms
+tempo multMatColVet, n = 128: 0.202398ms
 --------------------------------------------------------------------------------
 STRUCT,Info,3
 CPU name:,Intel(R) Core(TM) i5-7500 CPU @ 3.40GHz,
 CPU type:,Intel Coffeelake processor,
-CPU clock:,3.408017018 GHz,
-TABLE,Region multMatPtrVet,Group 1 Raw,L3,5
+CPU clock:,3.407022057 GHz,
+TABLE,Region multMatPtrVet,Group 1 Raw,L2CACHE,5
 Region Info,Core 3,
-RDTSC Runtime [s],0.000010,
+RDTSC Runtime [s],0.000016,
 call count,1,
 Event,Counter,Core 3
-INSTR_RETIRED_ANY,FIXC0,74298
-CPU_CLK_UNHALTED_CORE,FIXC1,47895
-CPU_CLK_UNHALTED_REF,FIXC2,43878
-L2_LINES_IN_ALL,PMC0,2001
-L2_TRANS_L2_WB,PMC1,428
-TABLE,Region multMatPtrVet,Group 1 Metric,L3,10
+INSTR_RETIRED_ANY,FIXC0,119210
+CPU_CLK_UNHALTED_CORE,FIXC1,71778
+CPU_CLK_UNHALTED_REF,FIXC2,64468
+L2_TRANS_ALL_REQUESTS,PMC0,10279
+L2_RQSTS_MISS,PMC1,3646
+TABLE,Region multMatPtrVet,Group 1 Metric,L2CACHE,7
 Metric,Core 3,
-Runtime (RDTSC) [s],9.535154e-06,
-Runtime unhalted [s],1.405363e-05,
-Clock [MHz],3720.0186,
-CPI,0.6446,
-L3 load bandwidth [MBytes/s],13430.7217,
-L3 load data volume [GBytes],0.0001,
-L3 evict bandwidth [MBytes/s],2872.7381,
-L3 evict data volume [GBytes],2.739200e-05,
-L3 bandwidth [MBytes/s],16303.4598,
-L3 data volume [GBytes],0.0002,
+Runtime (RDTSC) [s],1.578842e-05,
+Runtime unhalted [s],2.106767e-05,
+Clock [MHz],3793.3429,
+CPI,0.6021,
+L2 request rate,0.0862,
+L2 miss rate,0.0306,
+L2 miss ratio,0.3547,
 STRUCT,Info,3
 CPU name:,Intel(R) Core(TM) i5-7500 CPU @ 3.40GHz,
 CPU type:,Intel Coffeelake processor,
-CPU clock:,3.408017018 GHz,
-TABLE,Region multMatRowVet,Group 1 Raw,L3,5
+CPU clock:,3.407022057 GHz,
+TABLE,Region multMatRowVet,Group 1 Raw,L2CACHE,5
 Region Info,Core 3,
-RDTSC Runtime [s],0.000009,
+RDTSC Runtime [s],0.000015,
 call count,1,
 Event,Counter,Core 3
-INSTR_RETIRED_ANY,FIXC0,74201
-CPU_CLK_UNHALTED_CORE,FIXC1,44310
-CPU_CLK_UNHALTED_REF,FIXC2,41180
-L2_LINES_IN_ALL,PMC0,1840
-L2_TRANS_L2_WB,PMC1,252
-TABLE,Region multMatRowVet,Group 1 Metric,L3,10
+INSTR_RETIRED_ANY,FIXC0,119085
+CPU_CLK_UNHALTED_CORE,FIXC1,68399
+CPU_CLK_UNHALTED_REF,FIXC2,61344
+L2_TRANS_ALL_REQUESTS,PMC0,9281
+L2_RQSTS_MISS,PMC1,3401
+TABLE,Region multMatRowVet,Group 1 Metric,L2CACHE,7
 Metric,Core 3,
-Runtime (RDTSC) [s],9.456516e-06,
-Runtime unhalted [s],1.300170e-05,
-Clock [MHz],3667.0528,
-CPI,0.5972,
-L3 load bandwidth [MBytes/s],12452.7892,
-L3 load data volume [GBytes],0.0001,
-L3 evict bandwidth [MBytes/s],1705.4907,
-L3 evict data volume [GBytes],1.612800e-05,
-L3 bandwidth [MBytes/s],14158.2799,
-L3 data volume [GBytes],0.0001,
+Runtime (RDTSC) [s],1.530059e-05,
+Runtime unhalted [s],2.007589e-05,
+Clock [MHz],3798.8540,
+CPI,0.5744,
+L2 request rate,0.0779,
+L2 miss rate,0.0286,
+L2 miss ratio,0.3664,
 STRUCT,Info,3
 CPU name:,Intel(R) Core(TM) i5-7500 CPU @ 3.40GHz,
 CPU type:,Intel Coffeelake processor,
-CPU clock:,3.408017018 GHz,
-TABLE,Region multMatColVet,Group 1 Raw,L3,5
+CPU clock:,3.407022057 GHz,
+TABLE,Region multMatColVet,Group 1 Raw,L2CACHE,5
 Region Info,Core 3,
-RDTSC Runtime [s],0.000010,
+RDTSC Runtime [s],0.000017,
 call count,1,
 Event,Counter,Core 3
-INSTR_RETIRED_ANY,FIXC0,84429
-CPU_CLK_UNHALTED_CORE,FIXC1,47828
-CPU_CLK_UNHALTED_REF,FIXC2,44020
-L2_LINES_IN_ALL,PMC0,1870
-L2_TRANS_L2_WB,PMC1,254
-TABLE,Region multMatColVet,Group 1 Metric,L3,10
+INSTR_RETIRED_ANY,FIXC0,135597
+CPU_CLK_UNHALTED_CORE,FIXC1,74107
+CPU_CLK_UNHALTED_REF,FIXC2,66740
+L2_TRANS_ALL_REQUESTS,PMC0,48419
+L2_RQSTS_MISS,PMC1,6830
+TABLE,Region multMatColVet,Group 1 Metric,L2CACHE,7
 Metric,Core 3,
-Runtime (RDTSC) [s],1.048937e-05,
-Runtime unhalted [s],1.403397e-05,
-Clock [MHz],3702.8314,
-CPI,0.5665,
-L3 load bandwidth [MBytes/s],11409.6461,
-L3 load data volume [GBytes],0.0001,
-L3 evict bandwidth [MBytes/s],1549.7594,
-L3 evict data volume [GBytes],1.625600e-05,
-L3 bandwidth [MBytes/s],12959.4056,
-L3 data volume [GBytes],0.0001,
+Runtime (RDTSC) [s],1.708167e-05,
+Runtime unhalted [s],2.175125e-05,
+Clock [MHz],3783.1013,
+CPI,0.5465,
+L2 request rate,0.3571,
+L2 miss rate,0.0504,
+L2 miss ratio,0.1411,
