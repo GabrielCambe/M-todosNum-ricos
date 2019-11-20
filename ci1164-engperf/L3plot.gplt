@@ -8,10 +8,11 @@ set xtics
 set xrange ["0":]
 set xlabel  "N^2 * 8bytes"
 set ylabel  "L3 bandwidth [MBytes/s]"
-set title   "Largura de Banda para Memória L3>"
+set title   "Largura de Banda para Memória L3"
 #set terminal qt 0 title "<campo[<metrica]>"
 plot 'L3multMatPtrVet.dat' title "multMatPtrVet" with linespoints, \
      'L3multMatRowVet.dat' title "multMatRowVet" with linespoints, \
 	'L3multMatColVet.dat' title "multMatColVet" with linespoints
 
 pause -1
+

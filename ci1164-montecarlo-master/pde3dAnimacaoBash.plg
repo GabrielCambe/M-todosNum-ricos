@@ -1,0 +1,19 @@
+reset
+# para animacao
+# set terminal pngcairo
+set terminal pngcairo size 1920,1080
+set output ARG4
+
+#set print "-"
+set title "Solução númerica da PDE"    
+set xlabel "X"    
+set ylabel "Y" 
+
+set autoscale
+#set view 0, 0, 1, 1
+#set view 0,0
+set samples ARG2, ARG3
+set isosamples ARG2, ARG3
+set grid
+set hidden3d
+splot ARG1 using 1:2:3 w lines

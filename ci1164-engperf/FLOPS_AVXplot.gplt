@@ -1,0 +1,17 @@
+#!/usr/bin/gnuplot -c
+set grid
+set style data point
+set style function line
+set style line 1 lc 3 pt 7 ps 0.3
+set boxwidth 1
+set xtics
+set xrange ["0":]
+set xlabel  "N^2 * 8bytes"
+set ylabel  "Packed DP MFLOP/s"
+set title   "Operações AVX em ponto flutuante"
+#set terminal qt 0 title "<campo[<metrica]>"
+plot 'FLOPS_AVXmultMatPtrVet.dat' title "multMatPtrVet" with linespoints, \
+     'FLOPS_AVXmultMatRowVet.dat' title "multMatRowVet" with linespoints, \
+	'FLOPS_AVXmultMatColVet.dat' title "multMatColVet" with linespoints
+
+pause -1

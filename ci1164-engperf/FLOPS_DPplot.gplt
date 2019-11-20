@@ -1,0 +1,17 @@
+#!/usr/bin/gnuplot -c
+set grid
+set style data point
+set style function line
+set style line 1 lc 3 pt 7 ps 0.3
+set boxwidth 1
+set xtics
+set xrange ["0":]
+set xlabel  "N^2 * 8bytes"
+set ylabel  "DP MFLOP/s"
+set title   "MFLOP/s de dupla precisão"
+#set terminal qt 0 title "<campo[<metrica]>"
+plot 'FLOPS_DPmultMatPtrVet.dat' title "multMatPtrVet" with linespoints, \
+     'FLOPS_DPmultMatRowVet.dat' title "multMatRowVet" with linespoints, \
+	'FLOPS_DPmultMatColVet.dat' title "multMatColVet" with linespoints
+
+pause -1
